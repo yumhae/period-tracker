@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Period Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input[type="date"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="date"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .predictions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .prediction-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .prediction-card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .prediction-card p {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .calendar {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-header h2 {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .calendar-nav button {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .calendar-nav button:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            color: #666;
+            font-size: 12px;
+            padding: 10px 0;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            border: 2px solid transparent;
+        }
+
+        .calendar-day:hover {
+            border-color: #667eea;
+        }
+
+        .calendar-day.other-month {
+            color: #ccc;
+        }
+
+        .calendar-day.today {
+            border-color: #333;
+            font-weight: 700;
+        }
+
+        .calendar-day.period {
+            background: #ff6b6b;
+            color: white;
+            font-weight: 600;
+        }
+
+        .calendar-day.fertile {
+            background: #51cf66;
+            color: white;
+            font-weight: 600;
+        }
+
+        .calendar-day.ovulation {
+            background: #ffd43b;
+            color: #333;
+            font-weight: 700;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .content {
+                padding: 20px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .predictions {
+                grid-template-columns: 1fr;
+            }
+
+            .calendar-day {
+                font-size: 12px;
+            }
+
+            .legend {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌸 Period Tracker</h1>
+            <p>Track your cycle and stay informed</p>
+        </div>
+
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="lastPeriod">Last Period Start Date</label>
+                    <input type="date" id="lastPeriod">
+                </div>
+                <div class="input-group">
+                    <label for="cycleLength">Average Cycle Length (days)</label>
+                    <input type="number" id="cycleLength" min="21" max="35" value="28">
+                </div>
+                <button class="btn" onclick="calculatePredictions()">Calculate</button>
+            </div>
+
+            <div id="results" class="hidden">
+                <div class="predictions">
+                    <div class="prediction-card">
+                        <h3>Next Period</h3>
+                        <p id="nextPeriod">-</p>
+                    </div>
+                    <div class="prediction-card">
+                        <h3>Ovulation Day</h3>
+                        <p id="ovulationDay">-</p>
+                    </div>
+                    <div class="prediction-card">
+                        <h3>Fertile Window</h3>
+                        <p id="fertileWindow">-</p>
+                    </div>
+                </div>
+
+                <div class="calendar">
+                    <div class="calendar-header">
+                        <h2 id="currentMonth"></h2>
+                        <div class="calendar-nav">
+                            <button onclick="changeMonth(-1)">← Prev</button>
+                            <button onclick="changeMonth(1)">Next →</button>
+                        </div>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid"></div>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #ff6b6b;"></div>
+                            <span>Period</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #ffd43b;"></div>
+                            <span>Ovulation</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #51cf66;"></div>
+                            <span>Fertile</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="border: 2px solid #333;"></div>
+                            <span>Today</span>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        let displayMonth = new Date();
+        let trackerData = {};
+
+        // Load saved data on page load
+        window.onload = function() {
+            loadData();
+        };
+
+        function loadData() {
+            const saved = JSON.parse(localStorage.getItem('periodTracker') || '{}');
+            if (saved.lastPeriod) {
+                document.getElementById('lastPeriod').value = saved.lastPeriod;
+                document.getElementById('cycleLength').value = saved.cycleLength || 28;
+                calculatePredictions();
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('periodTracker', JSON.stringify(trackerData));
+        }
+
+        function calculatePredictions() {
+            const lastPeriodInput = document.getElementById('lastPeriod').value;
+            const cycleLength = parseInt(document.getElementById('cycleLength').value);
+
+            if (!lastPeriodInput) {
+                alert('Please enter your last period start date');
+                return;
+            }
+
+            const lastPeriod = new Date(lastPeriodInput);
+            
+            // Calculate predictions
+            const nextPeriod = new Date(lastPeriod);
+            nextPeriod.setDate(nextPeriod.getDate() + cycleLength);
+
+            const ovulation = new Date(lastPeriod);
+            ovulation.setDate(ovulation.getDate() + cycleLength - 14);
+
+            const fertileStart = new Date(ovulation);
+            fertileStart.setDate(fertileStart.getDate() - 5);
+
+            const fertileEnd = new Date(ovulation);
+            fertileEnd.setDate(fertileEnd.getDate() + 1);
+
+            // Store data
+            trackerData = {
+                lastPeriod: lastPeriodInput,
+                cycleLength: cycleLength,
+                nextPeriod: nextPeriod,
+                ovulation: ovulation,
+                fertileStart: fertileStart,
+                fertileEnd: fertileEnd
+            };
+
+            saveData();
+
+            // Display results
+            document.getElementById('nextPeriod').textContent = formatDate(nextPeriod);
+            document.getElementById('ovulationDay').textContent = formatDate(ovulation);
+            document.getElementById('fertileWindow').textContent = 
+                formatDate(fertileStart) + ' - ' + formatDate(fertileEnd);
+
+            document.getElementById('results').classList.remove('hidden');
+
+            // Reset display month to current month
+            displayMonth = new Date();
+            renderCalendar();
+        }
+
+        function formatDate(date) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return months[date.getMonth()] + ' ' + date.getDate();
+        }
+
+        function changeMonth(direction) {
+            displayMonth.setMonth(displayMonth.getMonth() + direction);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const year = displayMonth.getFullYear();
+            const month = displayMonth.getMonth();
+
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            document.getElementById('currentMonth').textContent = 
+                monthNames[month] + ' ' + year;
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const prevLastDay = new Date(year, month, 0);
+
+            const firstDayWeek = firstDay.getDay();
+            const daysInMonth = lastDay.getDate();
+            const prevDaysInMonth = prevLastDay.getDate();
+
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+
+            // Day headers
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayNames.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-day-header';
+                header.textContent = day;
+                calendarGrid.appendChild(header);
+            });
+
+            // Previous month days
+            for (let i = firstDayWeek - 1; i >= 0; i--) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day other-month';
+                day.textContent = prevDaysInMonth - i;
+                calendarGrid.appendChild(day);
+            }
+
+            // Current month days
+            for (let i = 1; i <= daysInMonth; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day';
+                day.textContent = i;
+
+                const dayDate = new Date(year, month, i);
+                
+                // Check if today
+                if (isSameDay(dayDate, currentDate)) {
+                    day.classList.add('today');
+                }
+
+                // Check if period day
+                if (trackerData.lastPeriod) {
+                    const lastPeriod = new Date(trackerData.lastPeriod);
+                    const daysSinceLastPeriod = Math.floor((dayDate - lastPeriod) / (1000 * 60 * 60 * 24));
+                    
+                    // Period days (5 days)
+                    if (daysSinceLastPeriod >= 0 && daysSinceLastPeriod < 5) {
+                        day.classList.add('period');
+                    }
+                    
+                    // Next period days
+                    const nextPeriodStart = trackerData.cycleLength;
+                    if (daysSinceLastPeriod >= nextPeriodStart && daysSinceLastPeriod < nextPeriodStart + 5) {
+                        day.classList.add('period');
+                    }
+
+                    // Ovulation day
+                    if (isSameDay(dayDate, trackerData.ovulation)) {
+                        day.classList.add('ovulation');
+                    }
+
+                    // Fertile window
+                    if (dayDate >= trackerData.fertileStart && dayDate <= trackerData.fertileEnd && 
+                        !isSameDay(dayDate, trackerData.ovulation)) {
+                        day.classList.add('fertile');
+                    }
+                }
+
+                calendarGrid.appendChild(day);
+            }
+
+            // Next month days
+            const remainingDays = 42 - (firstDayWeek + daysInMonth);
+            for (let i = 1; i <= remainingDays; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day other-month';
+                day.textContent = i;
+                calendarGrid.appendChild(day);
+            }
+        }
+
+        function isSameDay(date1, date2) {
+            return date1.getFullYear() === date2.getFullYear() &&
+                   date1.getMonth() === date2.getMonth() &&
+                   date1.getDate() === date2.getDate();
+        }
+    </script>
+</body>
+</html>
